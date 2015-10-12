@@ -1,0 +1,42 @@
+{
+  "name": "http2-push-manifest",
+  "version": "0.0.1",
+  "description": "Generate a list of static resources for http2 push.",
+  "homepage": "https://github.com/GoogleChrome/http2-push-manifest",
+  "author": "Eric Bidelman <ebidel@>",
+  "license": "Apache2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleChrome/http2-push-manifest"
+  },
+  "bugs": {
+    "url": "https://github.com/GoogleChrome/http2-push-manifest/issues"
+  },
+  "keywords": [
+    "http2",
+    "http2 push",
+    "performance"
+  ],
+  "main": "lib/manifest.js",
+  "bin": {
+    "http2-push-manifest": "bin/http2-push-manifest"
+  },
+  "engines": {
+    "node": ">=1.0"
+  },
+  "scripts": {
+    "lint": "jshint lib"
+  },
+  "dependencies": {
+    "dom5": "^1.1.1",
+    "hydrolysis": "^1.15.4",
+    "nopt": "^3.0.4",
+    "vulcanize": "^1.13.1"
+  },
+  "devDependencies": {
+    "jshint": "^2.8.0"
+  },
+  "optionalDependencies": {
+    "update-notifier": "^0.5.0"
+  }
+}

@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+
+/**
+ * Copyright 2015 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// jshint node: true
+'use strict';
+
+var nopt = require('nopt');
+var Manifest = require('../lib/manifest');
+var pkg = require('../package.json');
+
+const SCRIPT_NAME = 'http2-push-manifest';
+
+const help = `${SCRIPT_NAME}: Generate a list of static resources for http2 push.
+
+Usage:
+    ${SCRIPT_NAME} <path/to/file> <file>.html
+
+Options:
+    -h|--help: print this message
+    -v|--version: print version number
+    -m|--manifest <filename>: Custom filename for the manifest file
+
+Examples:
+
+List all of the resources used in app/index.html, including sub-HTML Imports:
+
+    ${SCRIPT_NAME} app index.html
+
+List all the resources used in static/elements/elements.html:
+
+    ${SCRIPT_NAME} static/elements elements.html
+
+Using a custom filename:
+
+    ${SCRIPT_NAME} path/to/site index.html -m push.json
+    ${SCRIPT_NAME} path/to/site index.html --manifest push.json
+`;
+
+var args = nopt({
+  help: Boolean,
+  version: Boolean,
+  manifest: String
+}, {
+  'h': ['--help'],
+  'v': ['--version'],
+  'm': ['--manifest']
+});
+
+var basePath = args.argv.remain[0];
+var inputPath = args.argv.remain[1];
+
+function printHelp() {
+  console.log(help);
+}
+
+function printVersion() {
+  console.log(`${SCRIPT_NAME}:`, pkg.version);
+}
+
+if (args.version) {
+  printVersion();
+  process.exit(0);
+}
+
+if (args.help || !basePath || !inputPath) {
+  printHelp();
+  process.exit(0);
+}
+
+// Let user know if there's a newer version.
+(function() {
+  try {
+    var updateNotifier = require('update-notifier');
+    updateNotifier({pkg: pkg}).notify();
+  } catch(e) {}
+})();
+
+var manifest = new Manifest({basePath, inputPath, manifest: args.manifest});
+manifest.generate().then(urls => {
+  console.log(`Wrote ${urls.length} URLs to manifest file: ${manifest.name}`);
+});
