@@ -2,7 +2,7 @@
 
 A utility script for doing http2 push. 
 
-Generates a list of static resources used in your web app by outputting a json
+Generates a list of local static resources used in your web app by outputting a json
 file. This file can be read by your web server to more easily construct the
 appropriate `Link: <URL>; rel=preload` headers(s).
 
