@@ -1,10 +1,10 @@
 # http2-push-manifest
 
-A utility script for doing http2 push. 
+A utility script for doing http2 push and/or preload. 
 
 Generates a list of local static resources used in your web app by outputting a json
 file. This file can be read by your web server to more easily construct the
-appropriate `Link: <URL>; rel=preload` headers(s).
+appropriate `Link: <URL>; rel=preload` headers(s) for http2 push/preload.
 
 ## Install
 
