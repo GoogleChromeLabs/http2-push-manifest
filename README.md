@@ -10,6 +10,10 @@ appropriate `Link: <URL>; rel=preload` headers(s) for http2 push/preload.
 
     npm install --save-dev http2-push-manifest
 
+## Run tests
+
+    npm test
+
 ## What's a push manifest?
 
 > A **manifest is not required by the HTTP2 protocol** but is useful

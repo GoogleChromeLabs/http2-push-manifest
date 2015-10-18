@@ -90,7 +90,7 @@ if (args.help || !basePath || !inputPath) {
   } catch(e) {}
 })();
 
-var manifest = new Manifest({basePath, inputPath, manifest: args.manifest});
+var manifest = new Manifest({basePath, inputPath, name: args.manifest});
 manifest.generate().then(urls => {
   console.log(`Wrote ${urls.length} URLs to manifest file: ${manifest.name}`);
 });

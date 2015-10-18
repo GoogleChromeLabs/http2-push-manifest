@@ -25,7 +25,8 @@
     "node": ">=1.0"
   },
   "scripts": {
-    "lint": "jshint lib"
+    "lint": "jshint --verbose lib",
+    "test": "npm run lint; mocha"
   },
   "dependencies": {
     "dom5": "^1.1.1",
@@ -34,7 +35,8 @@
     "vulcanize": "^1.13.1"
   },
   "devDependencies": {
-    "jshint": "^2.8.0"
+    "jshint": "^2.8.0",
+    "mocha": "^2.3.3"
   },
   "optionalDependencies": {
     "update-notifier": "^0.5.0"
