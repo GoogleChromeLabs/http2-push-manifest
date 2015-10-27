@@ -19,11 +19,12 @@
 // jshint node: true
 'use strict';
 
-var nopt = require('nopt');
-var Manifest = require('../lib/manifest');
-var pkg = require('../package.json');
+let nopt = require('nopt');
+let path = require('path');
+let Manifest = require('../lib/manifest');
+let pkg = require('../package.json');
 
-const SCRIPT_NAME = 'http2-push-manifest';
+const SCRIPT_NAME = path.basename(__filename);
 
 const help = `${SCRIPT_NAME}: Generate a list of static resources for http2 push.
 
@@ -51,7 +52,7 @@ Using a custom filename:
     ${SCRIPT_NAME} path/to/site index.html --manifest push.json
 `;
 
-var args = nopt({
+let args = nopt({
   help: Boolean,
   version: Boolean,
   manifest: String
@@ -61,8 +62,8 @@ var args = nopt({
   'm': ['--manifest']
 });
 
-var basePath = args.argv.remain[0];
-var inputPath = args.argv.remain[1];
+let basePath = args.argv.remain[0];
+let inputPath = args.argv.remain[1];
 
 function printHelp() {
   console.log(help);
@@ -90,7 +91,7 @@ if (args.help || !basePath || !inputPath) {
   } catch(e) {}
 })();
 
-var manifest = new Manifest({basePath, inputPath, name: args.manifest});
+let manifest = new Manifest({basePath, inputPath, name: args.manifest});
 manifest.generate().then(urls => {
   console.log(`Wrote ${urls.length} URLs to manifest file: ${manifest.name}`);
 });
