@@ -93,5 +93,5 @@ if (args.help || !basePath || !inputPath) {
 
 let manifest = new Manifest({basePath, inputPath, name: args.manifest});
 manifest.generate().then(urls => {
-  console.log(`Wrote ${urls.length} URLs to manifest file: ${manifest.name}`);
+  console.log(`Wrote ${manifest.name}`);
 });
