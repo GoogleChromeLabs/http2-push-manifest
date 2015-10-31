@@ -144,5 +144,5 @@ class Handler(http2.PushHandler):
 [travis-image]: https://travis-ci.org/GoogleChrome/http2-push-manifest.svg?branch=master
 [daviddm-url]: https://david-dm.org/GoogleChrome/http2-push-manifest
 [daviddm-image]: https://david-dm.org/GoogleChrome/http2-push-manifest.svg
-[license-image]: https://img.shields.io/npm/l/http2-push-manifest.svg?style=flat-square
+[license-image]: https://img.shields.io/npm/l/http2-push-manifest.svg
 [license-url]: LICENSE
