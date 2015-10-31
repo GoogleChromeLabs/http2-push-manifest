@@ -41,9 +41,10 @@ function unmuteLogger() {
 
 function listresources(manifest) {
   muteLogger();
-  return manifest.generate().then(list => {
+  return manifest.generate().then(output => {
+    manifest.write();
     unmuteLogger();
-    return list;
+    return output;
   });
 }
 
@@ -72,11 +73,11 @@ suite('manifest.js', () => {
 
   test('list resources', done => {
 
-    listresources(manifest).then(list => {
+    listresources(manifest).then(output => {
       let name = manifest.DEFAULT_MANIFEST_NAME;
       let urls = Object.keys(EXPECTED_FILE);
 
-      assert.equal(list.length, urls.length, 'found all resources');
+      assert.equal(output.urls.length, urls.length, 'found all resources');
 
       fs.readFile(name, (err, data) => {
         if (err) {
@@ -84,6 +85,10 @@ suite('manifest.js', () => {
         }
 
         var json = JSON.parse(data);
+
+        assert.equal(JSON.stringify(json), JSON.stringify(output.file),
+                     'Written file does not match .file property');
+
 
         assert(!json['https://example.com/json'], 'External files are left out');
         assert(EXPECTED_FILE['/doesntexist.json'], 'non-existent local resources are included');
@@ -119,7 +124,7 @@ suite('manifest.js', () => {
 
     assert.equal(manifest.name, name, 'custom manifest file name set');
 
-    listresources(manifest).then(list => {
+    listresources(manifest).then(ouput => {
       assert(fs.statSync(name).isFile(), 'custom manifest written');
       fs.unlinkSync(name); // cleanup
       done();

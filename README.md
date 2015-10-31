@@ -59,22 +59,62 @@ Example of generated `push_manifest.json` with discovered local resources:
       }
     }
 
-**Note**: as of now, no browser implements control over the priority level.
+**Note**: as of now, no browser implements control over the priority/weight level.
 
 ## Examples
 
 **Example** - list all the static resources of `app/index.html` (including sub-HTML Imports):
 
-    http2-push-manifest app index.html
+    http2-push-manifest -f app/index.html
+
+A single file produces the "single-file manifest format":
+
+    {
+      "/css/app.css": {
+        "type": "style",
+        "weight": 1
+      },
+      "/js/app.js": {
+        "type": "script",
+        "weight": 1
+      },
+      ...
+    }
 
 **Example** - list all the resources in `static/elements/elements.html`:
 
-    http2-push-manifest static/elements elements.html
+    http2-push-manifest -f static/elements/elements.html
+
+**Example** - list all the resources app/index.html and page.html, and combine
+into a singe manifest:
+
+    http2-push-manifest -f app/index.html -f page.html
+
+Using multiple files produces the "multi-file manifest format". Each key is the file
+and it's sub-objects are the found resources. It would be up to your server to 
+decide how the mappings of key -> actual URL work.
+
+    {
+      "index.html": {
+        "/css/app.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      },
+      "page.html": {
+        "/css/page.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      }
+    }
 
 **Example** - using a custom manifest filename:
 
-    http2-push-manifest path/to/site index.html -m push.json
-    http2-push-manifest path/to/site index.html --manifest push.json
+    http2-push-manifest -f path/to/site/index.html -m push.json
+    http2-push-manifest -f path/to/site/index.html --manifest push.json
 
 ## Usage on App Engine
 
