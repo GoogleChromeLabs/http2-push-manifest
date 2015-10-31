@@ -1,6 +1,11 @@
-# http2-push-manifest
+[![NPM version][npm-image]][npm-url]
+[![Build status][travis-image]][travis-url]
+[![Dependency Status][david-image]][david-url]
+[![License][license-image]][license-url]
+[![Downloads][downloads-image]][downloads-url]
+[![Gittip][gittip-image]][gittip-url]
 
-A utility script for doing http2 push and/or preload. 
+> A utility script for doing http2 push and/or preload. 
 
 Generates a list of **local static resources** used in your web app by outputting a json
 file. This file can be read by your web server to more easily construct the
@@ -130,3 +135,16 @@ class Handler(http2.PushHandler):
   def get(self):
     # Resources in push_manifest.json will be server-pushed with this handler.
 ```
+
+## License
+
+[Apache 2.0](https://github.com/googlechrome/http2-push-manifest/blob/master/LICENSE) © 2015 Google Inc.
+
+[npm-url]: https://www.npmjs.com/package/http2-push-manifest
+[npm-image]: https://badge.fury.io/js/http2-push-manifest.svg
+[travis-url]: https://travis-ci.org/GoogleChrome/http2-push-manifest
+[travis-image]: https://travis-ci.org/GoogleChrome/http2-push-manifest.svg?branch=master
+[daviddm-url]: https://david-dm.org/GoogleChrome/http2-push-manifest
+[daviddm-image]: https://david-dm.org/GoogleChrome/http2-push-manifest.svg
+[license-image]: https://img.shields.io/npm/l/http2-push-manifest.svg?style=flat-square
+[license-url]: LICENSE
