@@ -22,7 +22,7 @@
     "http2-push-manifest": "bin/http2-push-manifest"
   },
   "engines": {
-    "node": ">=1.0"
+    "node": ">=4.0"
   },
   "scripts": {
     "lint": "jshint --verbose lib",
