@@ -118,6 +118,8 @@ suite('manifest.js', () => {
   });
 
   test('custom manifest', function(done) {
+    this.timeout(2000);
+
     let name = 'custom_manifest.json';
     let manifest = new PushManifest({
       basePath: BASE, inputPath: INPUT, name: name
@@ -125,7 +127,7 @@ suite('manifest.js', () => {
 
     assert.equal(manifest.name, name, 'custom manifest file name set');
 
-    listresources(manifest).then(ouput => {
+    listresources(manifest).then(output => {
       assert(fs.statSync(name).isFile(), 'custom manifest written');
       fs.unlinkSync(name); // cleanup
       done();
