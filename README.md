@@ -2,9 +2,9 @@
 
 A utility script for doing http2 push and/or preload. 
 
-Generates a list of local static resources used in your web app by outputting a json
+Generates a list of **local static resources** used in your web app by outputting a json
 file. This file can be read by your web server to more easily construct the
-appropriate `Link: <URL>; rel=preload` headers(s) for http2 push/preload.
+appropriate `Link: <URL>; rel=preload; as=<TYPE>` headers(s) for http2 push/preload.
 
 ## Install
 
@@ -12,7 +12,7 @@ appropriate `Link: <URL>; rel=preload` headers(s) for http2 push/preload.
 
 ## Run tests
 
-    npm test
+    npm run test
 
 ## What's a push manifest?
 
@@ -26,38 +26,95 @@ easily construct the appropriate `Link: <URL>; rel=preload` headers(s) used in
 HTTP2 push.
 
 By default, the script generates `push_manifest.json` in the top level directory
-of your app with a mapping of `<URL>: <PUSH_PRIORITY>`. Feel free to add/remove
+of your app with a mapping of `<URL>: <PUSH_PROPERTIES>`. Feel free to add/remove
 URLs from this list as necessary for your app or change the priority level.
 
-Example of generated `push_manifest.json` with discovered resources:
+Example of generated `push_manifest.json` with discovered local resources:
 
     {
-      "/css/app.css": 1,
-      "/js/app.js": 1,
-      "/bower_components/webcomponentsjs/webcomponents-lite.js": 1,
-      "/bower_components/iron-selector/iron-selection.html": 1,
+      "/css/app.css": {
+        "type": "style",
+        "weight": 1
+      },
+      "/js/app.js": {
+        "type": "script",
+        "weight": 1
+      },
+      "/bower_components/webcomponentsjs/webcomponents-lite.js": {
+        "type": "script",
+        "weight": 1
+      },
+      "/bower_components/iron-selector/iron-selection.html": {
+        "type": "document",
+        "weight": 1
+      },
       ...
-      "/elements.html": 1,
-      "/elements.vulcanize.html": 1
+      "/elements.html": {
+        "type": "document",
+        "weight": 1
+      },
+      "/elements.vulcanize.html": {
+        "type": "document",
+        "weight": 1
+      }
     }
 
-**Note**: right now the SPDY `<PUSH_PRIORITY>` is included, but it will be
-deprecated in the future as the new HTTP2 standard does not include this field.
+**Note**: as of now, no browser implements control over the priority/weight level.
 
 ## Examples
 
 **Example** - list all the static resources of `app/index.html` (including sub-HTML Imports):
 
-    http2-push-manifest app index.html
+    http2-push-manifest -f app/index.html
+
+A single file produces the "single-file manifest format":
+
+    {
+      "/css/app.css": {
+        "type": "style",
+        "weight": 1
+      },
+      "/js/app.js": {
+        "type": "script",
+        "weight": 1
+      },
+      ...
+    }
 
 **Example** - list all the resources in `static/elements/elements.html`:
 
-    http2-push-manifest static/elements elements.html
+    http2-push-manifest -f static/elements/elements.html
+
+**Example** - list all the resources app/index.html and page.html, and combine
+into a singe manifest:
+
+    http2-push-manifest -f app/index.html -f page.html
+
+Using multiple files produces the "multi-file manifest format". Each key is the file
+and it's sub-objects are the found resources. It would be up to your server to 
+decide how the mappings of key -> actual URL work.
+
+    {
+      "index.html": {
+        "/css/app.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      },
+      "page.html": {
+        "/css/page.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      }
+    }
 
 **Example** - using a custom manifest filename:
 
-    http2-push-manifest path/to/site index.html -m push.json
-    http2-push-manifest path/to/site index.html --manifest push.json
+    http2-push-manifest -f path/to/site/index.html -m push.json
+    http2-push-manifest -f path/to/site/index.html --manifest push.json
 
 ## Usage on App Engine
 

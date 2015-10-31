@@ -19,50 +19,73 @@
 // jshint node: true
 'use strict';
 
-var nopt = require('nopt');
-var Manifest = require('../lib/manifest');
-var pkg = require('../package.json');
+let nopt = require('nopt');
+let path = require('path');
+let Manifest = require('../lib/manifest');
+let pkg = require('../package.json');
 
-const SCRIPT_NAME = 'http2-push-manifest';
+const SCRIPT_NAME = path.basename(__filename);
 
 const help = `${SCRIPT_NAME}: Generate a list of static resources for http2 push.
 
 Usage:
-    ${SCRIPT_NAME} <path/to/file> <file>.html
+    ${SCRIPT_NAME} -f path/to/file.html
+    ${SCRIPT_NAME} -f path/to/file.html -f path/to/file2.html ...
 
 Options:
     -h|--help: print this message
     -v|--version: print version number
+    -f|--file: file to discover resources in. Use multiple times to produce a mult-file manifest format.
     -m|--manifest <filename>: Custom filename for the manifest file
 
 Examples:
 
 List all of the resources used in app/index.html, including sub-HTML Imports:
 
-    ${SCRIPT_NAME} app index.html
+    ${SCRIPT_NAME} -f app/index.html
+
+    {
+      "/css/app.css": {
+        "type": "style",
+        "weight": 1
+      },
+      "/js/app.js": {
+        "type": "script",
+        "weight": 1
+      },
+      ...
+    }
 
 List all the resources used in static/elements/elements.html:
 
-    ${SCRIPT_NAME} static/elements elements.html
+    ${SCRIPT_NAME} -f static/elements elements.html
+
+List all the resources app/index.html and page.html, and combine into a singe manifest:
+
+    ${SCRIPT_NAME} -f app/index.html -f page.html
+
+    {
+      "index.html": {
+        "/css/app.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      },
+      "page.html": {
+        "/css/page.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      }
+    }
 
 Using a custom filename:
 
-    ${SCRIPT_NAME} path/to/site index.html -m push.json
-    ${SCRIPT_NAME} path/to/site index.html --manifest push.json
+    ${SCRIPT_NAME} -f path/to/site/index.html -m push.json
+    ${SCRIPT_NAME} -f path/to/site/index.html --manifest push.json
 `;
-
-var args = nopt({
-  help: Boolean,
-  version: Boolean,
-  manifest: String
-}, {
-  'h': ['--help'],
-  'v': ['--version'],
-  'm': ['--manifest']
-});
-
-var basePath = args.argv.remain[0];
-var inputPath = args.argv.remain[1];
 
 function printHelp() {
   console.log(help);
@@ -72,25 +95,90 @@ function printVersion() {
   console.log(`${SCRIPT_NAME}:`, pkg.version);
 }
 
+function notifyIfUpdateAvailable() {
+  try {
+    let updateNotifier = require('update-notifier');
+    updateNotifier({pkg: pkg}).notify();
+  } catch(e) {
+    // noop
+  }
+}
+
+let jsonOutput = {};
+
+function writeManifest(manifest, opt_content) {
+  manifest.write(opt_content);
+  console.log(`Wrote ${manifest.name}`);
+}
+
+function generateManifest(manifestName, files, singleFile) {
+  if (!files.length) {
+    let manifest = new Manifest({name: manifestName});
+    writeManifest(manifest, jsonOutput);
+    return;
+  }
+
+  let f = files[0];
+
+  // Make a path if one wasn't given. e.g. basic.html -> ./basic.html
+  if (f.indexOf(path.sep) === -1) {
+    f = `.${path.sep}${f}`;
+  }
+
+  let basePath = f.slice(0, f.lastIndexOf(path.sep))
+  let inputPath = f.slice(f.lastIndexOf(path.sep) + 1);
+
+  if (!basePath || !inputPath) {
+    printHelp();
+    process.exit(1);
+  }
+
+  let manifest = new Manifest({basePath, inputPath, name: manifestName});
+  manifest.generate().then(output => {
+    if (singleFile) {
+      writeManifest(manifest);
+      return;
+    }
+
+    jsonOutput[inputPath] = output.file;
+
+    // Remove processed file from list and proceed with next.
+    files.shift();
+    generateManifest(manifestName, files, singleFile);
+  }).catch(err => {
+    console.warn(err);
+  });
+}
+
+let args = nopt({
+  help: Boolean,
+  version: Boolean,
+  manifest: String,
+  file: [String, Array]
+}, {
+  'h': ['--help'],
+  'v': ['--version'],
+  'm': ['--manifest'],
+  'f': ['--file']
+});
+
+let files = args.file || [];
+let manifestName = args.manifest;
+// let basePath = args.argv.remain[0];
+// let inputPath = args.argv.remain[1];
+
 if (args.version) {
   printVersion();
   process.exit(0);
 }
 
-if (args.help || !basePath || !inputPath) {
+if (args.help || !files.length) {
   printHelp();
   process.exit(0);
 }
 
-// Let user know if there's a newer version.
-(function() {
-  try {
-    var updateNotifier = require('update-notifier');
-    updateNotifier({pkg: pkg}).notify();
-  } catch(e) {}
-})();
+notifyIfUpdateAvailable(); // Let user know if there's a newer version.
 
-var manifest = new Manifest({basePath, inputPath, name: args.manifest});
-manifest.generate().then(urls => {
-  console.log(`Wrote ${urls.length} URLs to manifest file: ${manifest.name}`);
-});
+generateManifest(manifestName, files, files.length < 2);
+
+
