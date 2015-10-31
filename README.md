@@ -1,9 +1,7 @@
 [![NPM version][npm-image]][npm-url]
 [![Build status][travis-image]][travis-url]
-[![Dependency Status][david-image]][david-url]
+[![Dependency Status][daviddm-image]][daviddm-url]
 [![License][license-image]][license-url]
-[![Downloads][downloads-image]][downloads-url]
-[![Gittip][gittip-image]][gittip-url]
 
 > A utility script for doing http2 push and/or preload. 
 
