@@ -2,6 +2,7 @@
 
 // jshint node: true
 let assert = require('assert');
+let path = require('path');
 let fs = require('fs');
 
 const oldOld = console.log;
@@ -132,4 +133,61 @@ suite('manifest.js', () => {
 
   });
 
+});
+
+suite('cli', () => {
+  var exec = require('child_process').exec;
+
+  let CMD =  `${__dirname}/../bin/http2-push-manifest`;
+  let INPUT = `${__dirname}/html/basic.html`;
+  let INPUT2 = `${__dirname}/html/basic2.html`;
+  let NAME = 'push_manifest.json';
+
+  function process(cmd, cb) {
+    exec(cmd, (err, stdout, stderr) => {
+      assert(!err, 'error running cli');
+      cb(stdout);
+    });
+  }
+
+  suiteSetup(() => {
+    //manifest = new PushManifest({basePath: BASE, inputPath: INPUT});
+  });
+
+  test('single manifest', done => {
+    process(`${CMD} -f ${INPUT}`, stdout => {
+      assert(fs.statSync(NAME).isFile(), 'single file manifest written');
+      fs.unlinkSync(NAME); // cleanup
+      done();
+    });
+  });
+
+  test('custom manifest', done => {
+    let name = 'custom_manifest.json';
+    process(`${CMD} -f ${INPUT} -m ${name}`, stdout => {
+      assert(fs.statSync(name).isFile(), 'custom manifest written');
+      fs.unlinkSync(name); // cleanup
+      done();
+    });
+  });
+
+  test('multi manifest', done => {
+    process(`${CMD} -f ${INPUT} -f ${INPUT2}`,  stdout => {
+      assert(fs.statSync(NAME).isFile(), 'multi file manifest written');
+
+      fs.readFile(NAME, (err, data) => {
+        assert(!err, 'error reading multi file manifest');
+
+        var json = JSON.parse(data);
+
+        // Check top-level keys are the input file names.
+        assert(path.basename(INPUT) in json);
+        assert(path.basename(INPUT2) in json);
+
+        fs.unlinkSync(NAME); // cleanup
+
+        done();
+      });
+    });
+  });
 });
