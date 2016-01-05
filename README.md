@@ -119,6 +119,25 @@ decide how the mappings of key -> actual URL work.
     http2-push-manifest -f path/to/site/index.html -m push.json
     http2-push-manifest -f path/to/site/index.html --manifest push.json
 
+**Example** - providing a base path
+
+    http2-push-manifest -b path/to/site -f path/to/site/elements/index.html
+    
+Specifying a base path causes file paths to be generated relative to the base:
+
+    {
+      "elements/index.html": {
+        "/elements/css/app.css": {
+          "type": "style",
+          "weight": 1
+        },
+        ...
+      },
+      ...
+    }
+
+ 
+
 ## Usage on App Engine
 
 If you're using App Engine for your server, check out [http2push-gae](https://github.com/GoogleChrome/http2push-gae). It leverages this manifest file format and automagically reads

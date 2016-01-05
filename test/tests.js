@@ -141,6 +141,7 @@ suite('cli', () => {
   var exec = require('child_process').exec;
 
   let CMD =  `${__dirname}/../bin/http2-push-manifest`;
+  let BASE = `${__dirname}/html`;
   let INPUT = `${__dirname}/html/basic.html`;
   let INPUT2 = `${__dirname}/html/basic2.html`;
   let NAME = 'push_manifest.json';
@@ -174,7 +175,7 @@ suite('cli', () => {
   });
 
   test('multi manifest', done => {
-    process(`${CMD} -f ${INPUT} -f ${INPUT2}`,  stdout => {
+    process(`${CMD} -b ${BASE} -f ${INPUT} -f ${INPUT2}`,  stdout => {
       assert(fs.statSync(NAME).isFile(), 'multi file manifest written');
 
       fs.readFile(NAME, (err, data) => {
@@ -192,4 +193,26 @@ suite('cli', () => {
       });
     });
   });
+
+  test('manifest without base argument', done => {
+    process(`${CMD} -f ${INPUT} -f ${INPUT2}`,  stdout => {
+      assert(fs.statSync(NAME).isFile(), 'multi file manifest written');
+
+      fs.readFile(NAME, (err, data) => {
+        assert(!err, 'error reading multi file manifest');
+
+        var json = JSON.parse(data);
+
+        var inputPath = path.basename(__dirname) + '/' + path.relative(__dirname, INPUT);
+
+        // check that the top-level file name is relative to the current directory
+        assert(inputPath in json);
+
+        fs.unlinkSync(NAME); // cleanup
+
+        done();
+      });
+    });
+  });
+
 });
