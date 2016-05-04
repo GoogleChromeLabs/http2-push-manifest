@@ -172,7 +172,7 @@ let args = nopt({
 });
 
 let files = args.file || [];
-let root = args.root || [];
+let root = args.root || process.cwd();
 let manifestName = args.manifest;
 // let basePath = args.argv.remain[0];
 // let inputPath = args.argv.remain[1];
