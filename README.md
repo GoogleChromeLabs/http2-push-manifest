@@ -19,14 +19,16 @@ appropriate `Link: <URL>; rel=preload; as=<TYPE>` headers(s) for http2 push/prel
 
 ## What's a push manifest?
 
-> A **manifest is not required by the HTTP2 protocol** but is useful
-for telling your server what resources to push with your main page.* 
+> A **manifest is not required by the HTTP2 protocol**. We need it up! We found that it
+is useful for telling your server what critical resources to push for the requesting page.
 
 `http2-push-manifest` is a Node script for generating a JSON file listing
 all of the static resources used on a page. It tries to discover the resources
 in an .html file you specify. This file can be read by your web server to more
 easily construct the appropriate `Link: <URL>; rel=preload` headers(s) used in
-HTTP2 push.
+HTTP2 push. Since all the resources are discovered, you'll almost certainly want
+to **prune the list of files that get pushed**. Pushing too much can actually [hurt
+page load performance](https://twitter.com/ebidel/status/761016996339134464).
 
 By default, the script generates `push_manifest.json` in the top level directory
 of your app with a mapping of `<URL>: <PUSH_PROPERTIES>`. Feel free to add/remove
