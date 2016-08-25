@@ -124,7 +124,7 @@ decide how the mappings of key -> actual URL work.
 ## Usage on App Engine
 
 If you're using App Engine for your server, check out [http2push-gae](https://github.com/GoogleChrome/http2push-gae). It leverages this manifest file format and automagically reads
-`push_mainfest.json`, setting the `Link: rel="preload"` header for you.
+`push_manifest.json`, setting the `Link: rel="preload"` header for you.
 
 Simply decorate your request handler like so:
 
