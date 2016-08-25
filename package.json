@@ -4,7 +4,7 @@
   "description": "Generate a list of static resources for http2 push and preload.",
   "homepage": "https://github.com/GoogleChrome/http2-push-manifest",
   "author": "Eric Bidelman <ebidel@>",
-  "license": "Apache2",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/GoogleChrome/http2-push-manifest"
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "dom5": "^1.1.1",
-    "hydrolysis": "^1.15.4",
+    "hydrolysis": "1.22.0",
     "nopt": "^3.0.4",
     "vulcanize": "^1.13.1"
   },
