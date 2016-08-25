@@ -1,6 +1,6 @@
 {
   "name": "http2-push-manifest",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate a list of static resources for http2 push and preload.",
   "homepage": "https://github.com/GoogleChrome/http2-push-manifest",
   "author": "Eric Bidelman <ebidel@>",
