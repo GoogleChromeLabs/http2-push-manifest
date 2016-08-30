@@ -36,6 +36,7 @@ Options:
     -h|--help: print this message
     -v|--version: print version number
     -f|--file: file to discover resources in. Use multiple times to produce a mult-file manifest format.
+    -r|--root: root server path
     -m|--manifest <filename>: Custom filename for the manifest file
 
 Examples:
@@ -111,7 +112,7 @@ function writeManifest(manifest, opt_content) {
   console.log(`Wrote ${manifest.name}`);
 }
 
-function generateManifest(manifestName, files, singleFile) {
+function generateManifest(manifestName, files, singleFile, rootDir) {
   if (!files.length) {
     let manifest = new Manifest({name: manifestName});
     writeManifest(manifest, jsonOutput);
@@ -125,8 +126,14 @@ function generateManifest(manifestName, files, singleFile) {
     f = `.${path.sep}${f}`;
   }
 
-  let basePath = f.slice(0, f.lastIndexOf(path.sep))
-  let inputPath = f.slice(f.lastIndexOf(path.sep) + 1);
+  let basePath, inputPath;
+  if (!rootDir){
+    basePath = f.slice(0, f.lastIndexOf(path.sep))
+    inputPath = f.slice(f.lastIndexOf(path.sep) + 1);
+  } else {
+    basePath = rootDir;
+    inputPath = f;
+  }
 
   if (!basePath || !inputPath) {
     printHelp();
@@ -144,7 +151,7 @@ function generateManifest(manifestName, files, singleFile) {
 
     // Remove processed file from list and proceed with next.
     files.shift();
-    generateManifest(manifestName, files, singleFile);
+    generateManifest(manifestName, files, singleFile, rootDir);
   }).catch(err => {
     console.warn(err);
   });
@@ -154,15 +161,18 @@ let args = nopt({
   help: Boolean,
   version: Boolean,
   manifest: String,
-  file: [String, Array]
+  file: [String, Array],
+  root: String,
 }, {
   'h': ['--help'],
   'v': ['--version'],
   'm': ['--manifest'],
-  'f': ['--file']
+  'f': ['--file'],
+  'r': ['--root']
 });
 
 let files = args.file || [];
+let root = args.root || process.cwd();
 let manifestName = args.manifest;
 // let basePath = args.argv.remain[0];
 // let inputPath = args.argv.remain[1];
@@ -179,6 +189,4 @@ if (args.help || !files.length) {
 
 notifyIfUpdateAvailable(); // Let user know if there's a newer version.
 
-generateManifest(manifestName, files, files.length < 2);
-
-
+generateManifest(manifestName, files, files.length < 2, root);
