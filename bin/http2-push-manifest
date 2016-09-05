@@ -111,7 +111,7 @@ function writeManifest(manifest, opt_content) {
   console.log(`Wrote ${manifest.name}`);
 }
 
-function generateManifest(manifestName, files, singleFile) {
+function generateManifest(manifestName, basePath, files, singleFile) {
   if (!files.length) {
     let manifest = new Manifest({name: manifestName});
     writeManifest(manifest, jsonOutput);
@@ -125,8 +125,7 @@ function generateManifest(manifestName, files, singleFile) {
     f = `.${path.sep}${f}`;
   }
 
-  let basePath = f.slice(0, f.lastIndexOf(path.sep))
-  let inputPath = f.slice(f.lastIndexOf(path.sep) + 1);
+  let inputPath = path.relative(basePath, f);
 
   if (!basePath || !inputPath) {
     printHelp();
@@ -144,7 +143,7 @@ function generateManifest(manifestName, files, singleFile) {
 
     // Remove processed file from list and proceed with next.
     files.shift();
-    generateManifest(manifestName, files, singleFile);
+    generateManifest(manifestName, basePath, files, singleFile);
   }).catch(err => {
     console.warn(err);
   });
@@ -154,15 +153,18 @@ let args = nopt({
   help: Boolean,
   version: Boolean,
   manifest: String,
-  file: [String, Array]
+  file: [String, Array],
+  base: String
 }, {
   'h': ['--help'],
   'v': ['--version'],
   'm': ['--manifest'],
-  'f': ['--file']
+  'f': ['--file'],
+  'b': ['--base']
 });
 
 let files = args.file || [];
+let base = args.base || '.';
 let manifestName = args.manifest;
 // let basePath = args.argv.remain[0];
 // let inputPath = args.argv.remain[1];
@@ -179,6 +181,6 @@ if (args.help || !files.length) {
 
 notifyIfUpdateAvailable(); // Let user know if there's a newer version.
 
-generateManifest(manifestName, files, files.length < 2);
+generateManifest(manifestName, base, files, files.length < 2);
 
 
